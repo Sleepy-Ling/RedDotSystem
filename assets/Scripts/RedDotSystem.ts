@@ -9,11 +9,13 @@ export type IRedDotCheckFunc = (...param: any) => number;
 export class RedDotEvent {
     public checkFunc: IRedDotCheckFunc;
     public target: any;
+    public param: unknown[];
     id: string;
 
-    constructor(checkFunc: IRedDotCheckFunc, target: any) {
+    constructor(checkFunc: IRedDotCheckFunc, target: any, param: unknown[]) {
         this.checkFunc = checkFunc;
         this.target = target;
+        this.param = param;
 
         this.id = nanoid();
     }
@@ -65,6 +67,8 @@ class _RedDotSystem {
     /**事件检测计时器 */
     private _eventCheckTimer: number;
 
+    protected _root: IRedDotNode;
+
     init(redDot: cc.Node) {
         // let node = new cc.Node("redDot");
         // let spr = node.addComponent(cc.Sprite);
@@ -81,6 +85,15 @@ class _RedDotSystem {
 
 
     initRedDotTree(data: JSON, maxLayer: number = 4) {
+        let root: IRedDotNode = {
+            parent: undefined,
+            id: "",
+            child: new Set(),
+            isOn: false,
+            name: "",
+            uiNode: []
+        }
+
         let tmpPriorityRoot: IPriorityNode = {
             id: "",
             child: []
@@ -156,8 +169,14 @@ class _RedDotSystem {
         }
 
         for (const tmpPriorityNode of tmpPriorityRoot.child) {
-            redDotChildInit(this._registerMap, tmpPriorityNode, null);
+            if (tmpPriorityNode) {
+                redDotChildInit(this._registerMap, tmpPriorityNode, root);
+
+                root.child.add(this._registerMap.get(tmpPriorityNode.id));
+            }
         }
+
+        this._root = root;
 
         console.log("map ", this._registerMap);
 
@@ -166,7 +185,8 @@ class _RedDotSystem {
     private _doEventCheck() {
         const keys = Array.from(this._registerEventMap.keys());
         for (const k of keys) {
-            this.doEventStateCheck(k);
+            // this.doEventStateCheck(k);
+            this.doEventCountCheck(k);
         }
 
         this.RefreshAll();
@@ -206,7 +226,7 @@ class _RedDotSystem {
     }
 
     /**注册红点事件 */
-    RegisterEvent(key: string, func: IRedDotCheckFunc, target: any) {
+    RegisterEvent(key: string, func: IRedDotCheckFunc, target: any, ...param: unknown[]) {
         if (func == null) {
             console.error("regis event is null");
             return null;
@@ -231,7 +251,7 @@ class _RedDotSystem {
             return null;
         }
 
-        event = new RedDotEvent(func, target)
+        event = new RedDotEvent(func, target, param);
 
         redDotEventList.push(event);
 
@@ -413,49 +433,26 @@ class _RedDotSystem {
         return true;
     }
 
-    /**更新节点状态 */
-    protected doEventStateCheck(key: string) {
-        console.log("doEventStateCheck ==>", key);
-
+    protected doEventCountCheck(key: string) {
         /**红点列表 */
         const redDotNode: IRedDotNode = this._registerMap.get(key);
         const eventList = this._registerEventMap.get(key);
 
-        let now_isOn = false;
-        // let now_cnt: number = 0;
+        let now_cnt: number = 0;
 
         if (eventList) {
-            now_isOn = eventList.some((v) => {
-                return v.checkFunc.apply(v.target);
-            })
-
-            // for (const evt of eventList) {
-            //     let cnt = evt.checkFunc.apply(evt.target);
-            //     now_cnt += cnt;
-            // }
-
-
+            for (const evt of eventList) {
+                let cnt = evt.checkFunc.apply(evt.target, evt.param);
+                cnt = cnt < 0 ? 0 : cnt;
+                now_cnt += cnt || 0;
+            }
         }
 
-        let curChildList = Array.from(redDotNode.child);
-        for (const child of curChildList) {
-            now_isOn = child.isOn || now_isOn;
-
-            // now_cnt += child.count || 0;
-        }
-
-        let last_isOn = redDotNode.isOn;
-        redDotNode.isOn = now_isOn;
-
-        if (redDotNode.parent && last_isOn != now_isOn) {
-            this.doEventStateCheck(redDotNode.parent.id);
-        }
-
-        return now_isOn;
+        redDotNode.count = now_cnt;
     }
 
     /**刷新节点 */
-    protected refreshRedDot(RDNode: IRedDotNode, state: boolean) {
+    protected setRedDotState(RDNode: IRedDotNode, state: boolean, count: number) {
         if (state) {
             if (!RDNode.uiNode) {
                 return;
@@ -468,17 +465,24 @@ class _RedDotSystem {
                         redDot = cc.instantiate(this._redDot);
                     }
                     node.spr_redDot = redDot;
-                    node.lab_count = redDot.getComponentInChildren(cc.Label);
 
                     redDot.setParent(node.uiTrans);
                     let contentSize: cc.Size = node.uiTrans.getContentSize();
 
                     redDot.setPosition(contentSize.width / 2, contentSize.height / 2);
+                }
+                else {
+                    let redDot = node.spr_redDot;
 
-                    // if (RDNode.count && node.lab_count) {
-                    //     node.lab_count.string = RDNode.count.toString();
-                    //     node.lab_count.node.active = RDNode.count > 0;
-                    // }
+                    if (!node.lab_count) {
+                        node.lab_count = redDot.getComponentInChildren(cc.Label);
+                    }
+
+                    if (node.lab_count) {
+                        node.lab_count.string = count.toString();
+                        node.lab_count.node.active = count > 0;
+                    }
+
                 }
             }
         }
@@ -495,23 +499,20 @@ class _RedDotSystem {
      * @param count 个数
      */
     protected refreshRedDotCount(RDNode: IRedDotNode) {
-        let count: number = 0;
-        if (RDNode.count && RDNode.count > 0) {
+        let count: number = RDNode.count || 0;
 
-            let childList = Array.from(RDNode.child);
-            for (let i = 0; i < childList.length; i++) {
-                const child = childList[i];
-                count += this.refreshRedDotCount(child);
-            }
-
-
-            for (const node of RDNode.uiNode) {
-                if (count > 0) {
-                    node.lab_count.string = count.toString();
-                    node.lab_count.node.active = RDNode.count > 0;
-                }
-            }
+        let childList = Array.from(RDNode.child);
+        for (let i = 0; i < childList.length; i++) {
+            const child = childList[i];
+            count += this.refreshRedDotCount(child);
         }
+
+        // console.log(RDNode.id, " count ", count);
+
+        let isOn = count > 0;
+        RDNode.isOn = isOn;
+
+        this.setRedDotState(RDNode, isOn, count);
 
         return count;
     }
@@ -528,25 +529,17 @@ class _RedDotSystem {
 
     /**刷新全部节点 */
     RefreshAll() {
-        // for (let key in this._registerMap) {
-        //     let node = this._registerMap.get(key);
-        //     if (node.isOn) {
-        //         console.log("red  ->", node.id);
-
+        // this._registerMap.forEach((rdNode) => {
+        //     if (rdNode.isOn) {
+        //         console.log("red  ->", rdNode.id);
         //     }
 
-        //     this.refreshRedDot(node, node.isOn);
-        // }
+        //     this.refreshRedDot(rdNode, rdNode.isOn);
 
-        this._registerMap.forEach((rdNode) => {
-            if (rdNode.isOn) {
-                console.log("red  ->", rdNode.id);
-            }
+        // })
 
-            this.refreshRedDot(rdNode, rdNode.isOn);
+        this.refreshRedDotCount(this._root);
 
-            this.refreshRedDotCount(rdNode);
-        })
     }
 }
 

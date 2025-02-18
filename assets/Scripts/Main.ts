@@ -7,6 +7,7 @@
 
 import { nanoid } from "nanoid";
 import { RedDotSystem } from "./RedDotSystem";
+import { Enum_RedDotID } from "./RedDotKey";
 
 const { ccclass, property } = cc._decorator;
 
@@ -41,39 +42,51 @@ export default class NewClass extends cc.Component {
             }
         }
 
-        RedDotSystem.AddRedDotNode("c_0", "9");
-        RedDotSystem.AddRedDotNode("c_1", "9");
-        RedDotSystem.AddRedDotNode("c_2", "9");
+        //ui节点绑定指定事件
+        RedDotSystem.RegisterNode(Enum_RedDotID.Lobby.toString(), btnMap["1-0"]);
+        RedDotSystem.RegisterNode(Enum_RedDotID.CharacterSystem.toString(), btnMap["1-1"]);
+        RedDotSystem.RegisterNode(Enum_RedDotID.CombatSystem.toString(), btnMap["1-2"]);
+        RedDotSystem.RegisterNode(Enum_RedDotID.SocialSystem.toString(), btnMap["1-3"]);
 
-        RedDotSystem.RegisterNode("1", btnMap["1-0"]);
-        RedDotSystem.RegisterNode("2", btnMap["2-0"]);
-        RedDotSystem.RegisterNode("6", btnMap["2-1"]);
-        RedDotSystem.RegisterNode("9", btnMap["2-2"]);
+        RedDotSystem.RegisterNode(Enum_RedDotID.Task.toString(), btnMap["2-0"]);
+        RedDotSystem.RegisterNode(Enum_RedDotID.DailyTask.toString(), btnMap["4-0"]);
+        RedDotSystem.RegisterNode(Enum_RedDotID.WeeklyTask.toString(), btnMap["4-1"]);
+        RedDotSystem.RegisterNode(Enum_RedDotID.AchievementTask.toString(), btnMap["4-2"]);
 
-        RedDotSystem.RegisterNode("7", btnMap["4-1"]);
-        RedDotSystem.RegisterNode("8", btnMap["4-2"]);
+        RedDotSystem.RegisterNode(Enum_RedDotID.AchievementSystem.toString(), btnMap["2-1"]);
+        RedDotSystem.RegisterNode(Enum_RedDotID.PersonalAchievement.toString(), btnMap["4-3"]);
 
-        RedDotSystem.RegisterNode("3", btnMap["4-0"]);
-        // RedDotSystem.RegisterNode("4", btnMap["4-1"]);
-        // RedDotSystem.RegisterNode("5", btnMap["4-2"]);
+        RedDotSystem.RegisterNode(Enum_RedDotID.ShopSystem.toString(), btnMap["2-2"]);
+        RedDotSystem.RegisterNode(Enum_RedDotID.SignInSystem.toString(), btnMap["2-3"]);
 
-        RedDotSystem.RegisterNode("17", btnMap["1-1"]);
-        RedDotSystem.RegisterNode("22", btnMap["1-2"]);
-        RedDotSystem.RegisterNode("26", btnMap["1-3"]);
+        RedDotSystem.RegisterNode(Enum_RedDotID.CharacterCreation.toString(), btnMap["3-0"]);
+        RedDotSystem.RegisterNode(Enum_RedDotID.CharacterLeveling.toString(), btnMap["3-1"]);
+        RedDotSystem.RegisterNode(Enum_RedDotID.SkillSystem.toString(), btnMap["3-2"]);
+        // RedDotSystem.RegisterNode(Enum_RedDotID.EquipmentSystem.toString(), btnMap["3-3"]);
 
-        RedDotSystem.RegisterNode("c_0", btnMap["3-0"]);
-        RedDotSystem.RegisterNode("c_1", btnMap["3-1"]);
-        RedDotSystem.RegisterNode("c_2", btnMap["3-2"]);
+        //注册红点相关事件
+        RedDotSystem.RegisterEvent(Enum_RedDotID.Lobby.toString(), this.isBtnBusy, this, "1-0");
+        RedDotSystem.RegisterEvent(Enum_RedDotID.CharacterSystem.toString(), this.isBtnBusy, this, "1-1");
+        RedDotSystem.RegisterEvent(Enum_RedDotID.CombatSystem.toString(), this.isBtnBusy, this, "1-2");
+        RedDotSystem.RegisterEvent(Enum_RedDotID.SocialSystem.toString(), this.isBtnBusy, this, "1-3");
+        RedDotSystem.RegisterEvent(Enum_RedDotID.Task.toString(), this.isBtnBusy, this, "2-0");
+        RedDotSystem.RegisterEvent(Enum_RedDotID.DailyTask.toString(), this.isBtnBusy, this, "4-0");
+        RedDotSystem.RegisterEvent(Enum_RedDotID.WeeklyTask.toString(), this.isBtnBusy, this, "4-1");
+        RedDotSystem.RegisterEvent(Enum_RedDotID.AchievementTask.toString(), this.isBtnBusy, this, "4-2");
+        RedDotSystem.RegisterEvent(Enum_RedDotID.AchievementSystem.toString(), this.isBtnBusy, this, "2-1");
+        RedDotSystem.RegisterEvent(Enum_RedDotID.PersonalAchievement.toString(), this.isBtnBusy, this, "4-3");
+        RedDotSystem.RegisterEvent(Enum_RedDotID.ShopSystem.toString(), this.isBtnBusy, this, "2-2");
+        RedDotSystem.RegisterEvent(Enum_RedDotID.SignInSystem.toString(), this.isBtnBusy, this, "2-3");
+        RedDotSystem.RegisterEvent(Enum_RedDotID.CharacterCreation.toString(), this.isBtnBusy, this, "3-0");
+        RedDotSystem.RegisterEvent(Enum_RedDotID.CharacterLeveling.toString(), this.isBtnBusy, this, "3-1");
+        RedDotSystem.RegisterEvent(Enum_RedDotID.SkillSystem.toString(), this.isBtnBusy, this, "3-2");
+        // RedDotSystem.RegisterEvent(Enum_RedDotID.EquipmentSystem.toString(), this.isBtnBusy, this, "3-3");
 
-        RedDotSystem.RegisterEvent("3", this.isBtnBusy.bind(this, "4-0"), this);
-        RedDotSystem.RegisterEvent("7", this.isBtnBusy.bind(this, "4-1"), this);
-        RedDotSystem.RegisterEvent("8", this.isBtnBusy.bind(this, "4-2"), this);
+        //添加自定义红点事件
+        RedDotSystem.AddRedDotNode("c_0", Enum_RedDotID.Lobby.toString());
+        RedDotSystem.RegisterNode("c_0", btnMap["3-3"]);
+        RedDotSystem.RegisterEvent("c_0", this.isBtnBusy, this, "3-3");
 
-        RedDotSystem.RegisterEvent("c_0", this.isBtnBusy.bind(this, "3-0"), this);
-        RedDotSystem.RegisterEvent("c_1", this.isBtnBusy.bind(this, "3-1"), this);
-        RedDotSystem.RegisterEvent("c_2", this.isBtnBusy.bind(this, "3-2"), this);
-
-        RedDotSystem.setRedDotCount("c_0", 5);
     }
 
     protected onClickBtn(evt: cc.Event.EventMouse) {
@@ -81,7 +94,8 @@ export default class NewClass extends cc.Component {
         this.clickRecored;
 
         let name = evt.target.name;
-        console.log(evt.getButton());
+        console.log("click btn -->", name);
+
 
         let s = this.clickRecored[name] || 0;
 
@@ -92,8 +106,8 @@ export default class NewClass extends cc.Component {
     }
 
     protected isBtnBusy(name: string) {
-        console.log("name", this.clickRecored[name]);
+        // console.log("name", this.clickRecored[name]);
 
-        return this.clickRecored[name] > 0;
+        return this.clickRecored[name];
     }
 }
