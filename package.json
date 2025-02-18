@@ -1,0 +1,6 @@
+{
+  "type": "module",
+  "dependencies": {
+    "nanoid": "^3.0.0"
+  }
+}

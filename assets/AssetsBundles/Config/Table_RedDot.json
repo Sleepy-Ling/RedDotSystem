@@ -1,0 +1,134 @@
+﻿{
+  "1": {
+    "priority": "1",
+    "desciption": "大厅"
+  },
+  "2": {
+    "priority": "1.1",
+    "desciption": "任务系统"
+  },
+  "3": {
+    "priority": "1.1.1",
+    "desciption": "日常任务"
+  },
+  "4": {
+    "priority": "1.1.2",
+    "desciption": "周常任务"
+  },
+  "5": {
+    "priority": "1.1.3",
+    "desciption": "成就任务"
+  },
+  "6": {
+    "priority": "1.2",
+    "desciption": "成就系统"
+  },
+  "7": {
+    "priority": "1.2.1",
+    "desciption": "个人成就"
+  },
+  "8": {
+    "priority": "1.2.2",
+    "desciption": "公会成就"
+  },
+  "9": {
+    "priority": "1.3",
+    "desciption": "商城系统"
+  },
+  "10": {
+    "priority": "1.3.1",
+    "desciption": "金币商城"
+  },
+  "11": {
+    "priority": "1.3.2",
+    "desciption": "钻石商城"
+  },
+  "12": {
+    "priority": "1.3.3",
+    "desciption": "限时商城"
+  },
+  "13": {
+    "priority": "1.4",
+    "desciption": "签到"
+  },
+  "14": {
+    "priority": "1.4.1",
+    "desciption": "每日签到"
+  },
+  "15": {
+    "priority": "1.4.2",
+    "desciption": "累计签到"
+  },
+  "16": {
+    "priority": "1.5",
+    "desciption": "公告"
+  },
+  "17": {
+    "priority": "2",
+    "desciption": "角色系统"
+  },
+  "18": {
+    "priority": "2.1",
+    "desciption": "角色创建"
+  },
+  "19": {
+    "priority": "2.2",
+    "desciption": "角色升级"
+  },
+  "20": {
+    "priority": "2.3",
+    "desciption": "技能系统"
+  },
+  "21": {
+    "priority": "2.4",
+    "desciption": "装备系统"
+  },
+  "22": {
+    "priority": "3",
+    "desciption": "战斗系统"
+  },
+  "23": {
+    "priority": "3.1",
+    "desciption": "PVE"
+  },
+  "24": {
+    "priority": "3.2",
+    "desciption": "PVP"
+  },
+  "25": {
+    "priority": "3.3",
+    "desciption": "排位赛系统"
+  },
+  "26": {
+    "priority": "4",
+    "desciption": "社交系统"
+  },
+  "27": {
+    "priority": "4.1",
+    "desciption": "好友系统"
+  },
+  "28": {
+    "priority": "4.2",
+    "desciption": "公会系统"
+  },
+  "29": {
+    "priority": "4.3",
+    "desciption": "聊天系统"
+  },
+  "30": {
+    "priority": "5",
+    "desciption": "排行榜"
+  },
+  "31": {
+    "priority": "5.1",
+    "desciption": "个人排行榜"
+  },
+  "32": {
+    "priority": "5.2",
+    "desciption": "公会排行"
+  },
+  "33": {
+    "priority": "5.3",
+    "desciption": "服务器排行"
+  }
+}
