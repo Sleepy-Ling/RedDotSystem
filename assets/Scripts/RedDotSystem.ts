@@ -225,6 +225,38 @@ class _RedDotSystem {
 
     }
 
+    /**
+     * 移除某个类型的红点
+     * @param key 类型
+     * @param isAutoRemoveEvent 是否自动移除相关的全部事件(默认是)
+     * @returns 
+     */
+    public removeRedDotNode(key: string, isAutoRemoveEvent: boolean = true) {
+        if (!this._registerMap.has(key)) {
+            console.error("do not have key ->", key);
+
+            return false;
+        }
+
+        let rdNode = this._registerMap.get(key);
+        for (const uiNode of rdNode.uiNode) {
+            this.recoverUINode(uiNode);
+        }
+
+        let parentNode = rdNode.parent;
+        rdNode.parent = null;
+        rdNode.child.clear();
+        rdNode.child = null;
+        parentNode.child.delete(rdNode);
+        this._registerMap.delete(key);
+        
+        if (isAutoRemoveEvent) {
+            this._registerEventMap.delete(key);
+        }
+
+        return true;
+    }
+
     /**注册红点事件 */
     RegisterEvent(key: string, func: IRedDotCheckFunc, target: any, ...param: unknown[]) {
         if (func == null) {
@@ -312,10 +344,10 @@ class _RedDotSystem {
     /**
      * 取消某个事件注册 根据作用域 (最好填上事件类型，不然全部检索一遍全部事件)
      * @param target 事件作用域
-     * @param key 事件类型
+     * @param key 指定事件类型 （该值为空，则有关于target的全部事件都取消）
      */
     UnRegisterEventByTarget(target: any, key?: string) {
-        let isRegisterSucc: boolean = false;
+        let isUnRegisterSucc: boolean = false;
         if (key == null) {
             let keys = Array.from(this._registerEventMap.keys());
 
@@ -330,14 +362,12 @@ class _RedDotSystem {
                     if (target == rdEvent.target) {
                         eventList.splice(i, 1);
 
-                        if (!isRegisterSucc) {
-                            isRegisterSucc = true;
+                        if (!isUnRegisterSucc) {
+                            isUnRegisterSucc = true;
                         }
                     }
 
                 }
-
-                this._registerEventMap.set(k, eventList);
 
             }
         }
@@ -347,13 +377,13 @@ class _RedDotSystem {
                 return false;
             }
 
-            for (let i = eventList.length; i > 0; i--) {
+            for (let i = eventList.length - 1; i >= 0; i--) {
                 const rdEvent = eventList[i];
                 if (target == rdEvent.target) {
                     eventList.splice(i, 1);
 
-                    if (!isRegisterSucc) {
-                        isRegisterSucc = true;
+                    if (!isUnRegisterSucc) {
+                        isUnRegisterSucc = true;
                     }
                 }
 
@@ -362,7 +392,7 @@ class _RedDotSystem {
             this._registerEventMap.set(key, eventList);
         }
 
-        return isRegisterSucc;
+        return isUnRegisterSucc;
     }
 
     /**
@@ -436,6 +466,10 @@ class _RedDotSystem {
     protected doEventCountCheck(key: string) {
         /**红点列表 */
         const redDotNode: IRedDotNode = this._registerMap.get(key);
+        if (!redDotNode) {
+            return;
+        }
+
         const eventList = this._registerEventMap.get(key);
 
         let now_cnt: number = 0;

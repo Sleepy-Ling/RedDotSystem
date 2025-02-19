@@ -87,27 +87,36 @@ export default class NewClass extends cc.Component {
         RedDotSystem.RegisterNode("c_0", btnMap["3-3"]);
         RedDotSystem.RegisterEvent("c_0", this.isBtnBusy, this, "3-3");
 
-    }
+        setTimeout(() => {
+            console.log("remove !!");
+
+            RedDotSystem.removeRedDotNode("c_0");
+            RedDotSystem.removeRedDotNode(Enum_RedDotID.Task.toString());
+            RedDotSystem.UnRegisterEventByTarget(this, Enum_RedDotID.DailyTask.toString());
+
+    }, 5000);
+
+}
 
     protected onClickBtn(evt: cc.Event.EventMouse) {
 
-        this.clickRecored;
+    this.clickRecored;
 
-        let name = evt.target.name;
-        console.log("click btn -->", name);
-
-
-        let s = this.clickRecored[name] || 0;
-
-        let isLeft: boolean = evt.getButton() == 0;
+    let name = evt.target.name;
+    console.log("click btn -->", name);
 
 
-        this.clickRecored[name] = isLeft ? s + 1 : s - 1;
-    }
+    let s = this.clickRecored[name] || 0;
+
+    let isLeft: boolean = evt.getButton() == 0;
+
+
+    this.clickRecored[name] = isLeft ? s + 1 : s - 1;
+}
 
     protected isBtnBusy(name: string) {
-        // console.log("name", this.clickRecored[name]);
+    // console.log("name", this.clickRecored[name]);
 
-        return this.clickRecored[name];
-    }
+    return this.clickRecored[name];
+}
 }
